@@ -28,7 +28,6 @@ type section struct {
 	end   int
 }
 
-
 // helper func to assign sections of image to workers based on no. of threads
 func assignSections(height, workers int) []section {
 
@@ -39,13 +38,12 @@ func assignSections(height, workers int) []section {
 	start := 0
 
 	for i := 0; i < workers; i++ {
-	
+
 		rows := minRows
 		if i < extraRows {
 			rows++
 		}
 
-		
 		end := start + rows
 		sections[i] = section{start: start, end: end}
 		start = end
@@ -66,8 +64,6 @@ func countAlive(world [][]byte) int {
 
 	return count
 }
-
-
 
 //ProcessSection is called by the distributor once per turn
 /*
@@ -105,7 +101,6 @@ func (broker *Broker) ProcessSection(req gol.BrokerRequest, res *gol.BrokerRespo
 		p.Turns != prevParams.Turns ||
 		p.Threads != prevParams.Threads
 
-	
 	if needInit {
 		sections := assignSections(p.ImageHeight, numWorkers)
 
@@ -147,18 +142,17 @@ func (broker *Broker) ProcessSection(req gol.BrokerRequest, res *gol.BrokerRespo
 
 			client, err := rpc.Dial("tcp", address)
 			if err != nil {
-				return fmt.Errorf("error dialing worker %s for InitSection: %w", address, err)
+				return fmt.Errorf("error dialing worker %s for InitialiseWorker: %w", address, err)
 			}
 
 			var reply struct{}
-			if err := client.Call("GOLWorker.InitSection", initReq, &reply); err != nil {
+			if err := client.Call("GOLWorker.InitialiseWorker", initReq, &reply); err != nil {
 				client.Close()
-				return fmt.Errorf("InitSection RPC failed for worker %s: %w", address, err)
+				return fmt.Errorf("InitialiseWorker RPC failed for worker %s: %w", address, err)
 			}
 			client.Close()
 		}
 
-	
 		broker.mu.Lock()
 		broker.params = p
 		broker.sections = sections
@@ -167,7 +161,6 @@ func (broker *Broker) ProcessSection(req gol.BrokerRequest, res *gol.BrokerRespo
 		broker.alive = countAlive(world)
 		broker.mu.Unlock()
 	}
-
 
 	// Take a snapshot of sections/params under read lock
 	broker.mu.RLock()
@@ -192,7 +185,7 @@ func (broker *Broker) ProcessSection(req gol.BrokerRequest, res *gol.BrokerRespo
 			client, err := rpc.Dial("tcp", address)
 			if err != nil {
 
-				resultsChan <- sectionResult{err: fmt.Errorf("dial %s for Step: %w", address, err)}
+				resultsChan <- sectionResult{err: fmt.Errorf("dial %s for ProcessHaloTurn: %w", address, err)}
 				return
 			}
 
@@ -201,8 +194,8 @@ func (broker *Broker) ProcessSection(req gol.BrokerRequest, res *gol.BrokerRespo
 			var stepReq struct{}
 			var stepRes gol.SectionResponse
 
-			if err := client.Call("GOLWorker.Step", stepReq, &stepRes); err != nil {
-				resultsChan <- sectionResult{err: fmt.Errorf("Step RPC %s: %w", address, err)}
+			if err := client.Call("GOLWorker.ProcessHaloTurn", stepReq, &stepRes); err != nil {
+				resultsChan <- sectionResult{err: fmt.Errorf("ProcessHaloTurn RPC %s: %w", address, err)}
 				return
 			}
 
