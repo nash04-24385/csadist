@@ -370,7 +370,13 @@ func main() {
 		return
 	}
 
-	listener, err := net.Listen("tcp4", "0.0.0.0:8030")
+	port := os.Getenv("WORKER_PORT")
+	if port == "" {
+    	port = "8030" // default
+	}
+	listener, err := net.Listen("tcp4", "0.0.0.0:" + port)
+
+	
 	if err != nil {
 		fmt.Println("Error starting listener:", err)
 		os.Exit(1)
