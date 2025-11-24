@@ -230,7 +230,8 @@ func AliveCells(world [][]byte, width, height int) []util.Cell {
 // helper function to handle image saves
 func saveImage(p Params, c distributorChannels, world [][]byte, turn int) {
 	outFileName := fmt.Sprintf("%dx%dx%d", p.ImageWidth, p.ImageHeight, turn)
-	c.ioCommand <- ioOutput    	c.ioFilename <- outFileName 
+	c.ioCommand <- ioOutput    	
+	c.ioFilename <- outFileName 
 
 	for y := 0; y < p.ImageHeight; y++ {
 		for x := 0; x < p.ImageWidth; x++ {
