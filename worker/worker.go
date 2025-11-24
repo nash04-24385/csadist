@@ -382,7 +382,7 @@ func main() {
 		os.Exit(1)
 		return
 	}
-	fmt.Println("Worker listening on port 8030 (IPv4)...")
+	fmt.Printf("Worker listening on port %s (IPv4)...\n", port)
 
 	defer listener.Close()
 
