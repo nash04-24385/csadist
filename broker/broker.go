@@ -279,6 +279,8 @@ func main() {
 		workerAddresses: []string{
 			// CAN ALWAYS CHANGE
 			"127.0.0.1:8030",
+			"127.0.0.1:8031",
+			"127.0.0.1:8032",
 		},
 	}
 
