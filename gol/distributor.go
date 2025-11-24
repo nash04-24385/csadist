@@ -156,8 +156,12 @@ func distributor(p Params, c distributorChannels, keypress <-chan rune) {
 			continue
 		}
 
+		// if worker uses multiple threads internally, rows can update out of order before data arrives
+		clean := p
+		clean.Threads = 1
+
 		request := BrokerRequest{
-			Params: p,
+			Params: clean,
 			World:  world,
 		}
 
